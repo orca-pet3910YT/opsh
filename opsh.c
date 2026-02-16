@@ -5,24 +5,26 @@
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <readline/history.h>
+#include <readline/readline.h>
 
 char prompt[512];
 
 void ignore_sigint(int sig) { write(STDOUT_FILENO, "\n", 1); write(STDOUT_FILENO, prompt, strlen(prompt)); }
 
 int main() {
-  printf("opsh: orca's Primitive SHell (Op-Shell) 1.2\n");
+  printf("opsh: orca's Primitive SHell (Op-Shell) 1.3\n");
   char hostname[128];
   char wd[1024];
   char *path = getcwd(wd, 1023);
   gethostname(hostname, 127);
-  snprintf(prompt, 512, "[%s@%s:%s]$ ", getenv("USER"), hostname, wd); // does not print to console
+  snprintf(prompt, 512, "[\x1b[38;5;190m%s\x1b[0m@\x1b[38;5;190m%s\x1b[38;5;210m:\x1b[38;5;87m%s\x1b[0m]$ ", getenv("USER"), hostname, wd); // does not print to console
   char *command;
   for (;;) {
     signal(SIGINT, ignore_sigint); // ignore ^C in parent
-    char cmd[255];
-    printf(prompt); // prompt. customize as you want
-    command = fgets(cmd, sizeof(cmd), stdin);
+    //char cmd[255];
+    //printf(prompt); // prompt. customize as you want
+    command = readline(prompt);
     if (!command) {
       printf("EOF reached\n");
       exit(0);
@@ -34,8 +36,12 @@ int main() {
     if (command[0] == '#') {
       continue;
     }
+    add_history(command); // so that arrow keys arrow key
     wordexp_t thing;
-    if (wordexp(cmd, &thing, 0) != 0) {
+    if (wordexp(command, &thing, 0) != 0) {
+      printf(command);
+      printf("\n");
+      //printf(thing);
       printf("opsh: Bad command or binary\n");
       continue;
     }
