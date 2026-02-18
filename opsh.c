@@ -42,8 +42,8 @@ int main() {
     add_history(command); // so that arrow keys arrow key
     wordexp_t thing;
     if (wordexp(command, &thing, 0) != 0) {
-      printf(command);
-      printf("\n");
+      //printf(command);
+      //printf("\n");
       //printf(thing);
       printf("opsh: Bad command or binary\n");
       continue;
