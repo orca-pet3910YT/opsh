@@ -5,8 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <readline/history.h>
-#include <readline/readline.h>
 
 char prompt[512];
 
@@ -20,14 +18,15 @@ char *write_prompt() {
   return prompt;
 }
 int main() {
+  signal(SIGINT, ignore_sigint);
   printf("opsh: orca's Primitive SHell (Op-Shell) 1.4\n");
   //write_prompt(); // does not print to console
   char *command;
   for (;;) {
-    signal(SIGINT, ignore_sigint); // ignore ^C in parent
-    //char cmd[255];
-    //printf(prompt); // prompt. customize as you want
-    command = readline(write_prompt());
+    //signal(SIGINT, ignore_sigint); // ignore ^C in parent
+    char cmd[255];
+    printf(write_prompt()); // prompt. customize as you want
+    command = fgets(cmd, sizeof(cmd), stdin);
     if (!command) {
       printf("EOF reached\n");
       exit(0);
@@ -39,7 +38,7 @@ int main() {
     if (command[0] == '#') {
       continue;
     }
-    add_history(command); // so that arrow keys arrow key
+    //add_history(command); // so that arrow keys arrow key
     wordexp_t thing;
     if (wordexp(command, &thing, 0) != 0) {
       //printf(command);
@@ -85,16 +84,17 @@ int main() {
     pid_t pid = fork();
     if (pid == 0) {
       if (execvp(thing.we_wordv[0],
-        thing.we_wordv) == -1) {
+          thing.we_wordv) == -1) {
+        signal(SIGINT, SIG_DFL);
         printf("opsh: Fail to launch command\n");
         wordfree(&thing);
         exit(1);
       }
       wordfree(&thing); // apparently necessary
     } else if (pid > 0) {
-      signal(SIGINT, SIG_DFL);
       wait(NULL);
       wordfree(&thing);
+      //free(command);
     } else {
       printf("opsh: fork failed\n");
       wordfree(&thing);
