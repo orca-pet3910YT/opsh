@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
       exit(0);
     }
     if (strcmp(thing.we_wordv[0], "crash") == 0) {
-      __asm__("ud2");
+      __asm__("ud2"); // guaranteed to crash; read the x86 instruction set
       continue;
     }
     if (strcmp(thing.we_wordv[0], "cd") == 0) {
