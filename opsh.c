@@ -8,7 +8,6 @@
 #include <errno.h>
 
 char prompt[512];
-int *pointer = 0;
 
 void ignore_sigint(int sig) { write(STDOUT_FILENO, "\n", 1); write(STDOUT_FILENO, prompt, strlen(prompt)); }
 void sighup_notify() {
@@ -73,7 +72,7 @@ int main(int argc, char **argv) {
       exit(0);
     }
     if (strcmp(thing.we_wordv[0], "crash") == 0) {
-      printf("%p", *pointer);
+      __asm__("ud2");
       continue;
     }
     if (strcmp(thing.we_wordv[0], "cd") == 0) {
