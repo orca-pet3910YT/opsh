@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <errno.h>
 
 char prompt[512];
 
@@ -17,9 +18,15 @@ char *write_prompt() {
   snprintf(prompt, 511, "[\x1b[38;5;190m%s\x1b[0m@\x1b[38;5;190m%s\x1b[38;5;210m:\x1b[38;5;87m%s\x1b[0m]$ ", getenv("USER"), hostname, wd);
   return prompt;
 }
-int main() {
+int main(int argc, char **argv) {
+  if (argv[1]) {
+    if (!strcmp(argv[1], "--cat")) {
+      printf("meow\n"); // we need humor
+      exit(0);
+    }
+  }
   signal(SIGINT, ignore_sigint);
-  printf("opsh: orca's Primitive SHell (Op-Shell) 1.4\n");
+  printf("opsh: orca's Primitive SHell (Op-Shell) 1.5\n");
   //write_prompt(); // does not print to console
   char *command;
   for (;;) {
@@ -56,6 +63,7 @@ int main() {
       if (thing.we_wordv[1] != NULL) {
         if (chdir(thing.we_wordv[1]) != 0) {
           printf("opsh: failed to change directory\n");
+          perror("cd");
           continue;
         }
         char buffer[1024];
@@ -73,6 +81,7 @@ int main() {
           char *pptr = getcwd(NULL, 0);
           if (!pptr) {
             printf("opsh: failure to display directory\n");
+            perror("opsh");
           } else {
             printf("opsh: you're in %s\n", pptr);
           }
@@ -87,6 +96,7 @@ int main() {
           thing.we_wordv) == -1) {
         signal(SIGINT, SIG_DFL);
         printf("opsh: Fail to launch command\n");
+        perror("execvp");
         wordfree(&thing);
         exit(1);
       }
@@ -97,6 +107,7 @@ int main() {
       //free(command);
     } else {
       printf("opsh: fork failed\n");
+      perror("fork");
       wordfree(&thing);
       exit(1);
     }
