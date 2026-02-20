@@ -8,8 +8,18 @@
 #include <errno.h>
 
 char prompt[512];
+int *pointer = 0;
 
 void ignore_sigint(int sig) { write(STDOUT_FILENO, "\n", 1); write(STDOUT_FILENO, prompt, strlen(prompt)); }
+void sighup_notify() {
+  printf("\nopsh: received signal SIGHUP, terminating\n");
+  exit(1);
+}
+void sigquit_notify() {
+  printf("\nSysRq or system shutdown\n");
+  exit(1);
+}
+
 char *write_prompt() {
   char hostname[128];
   char wd[1024];
@@ -26,6 +36,8 @@ int main(int argc, char **argv) {
     }
   }
   signal(SIGINT, ignore_sigint);
+  signal(SIGHUP, sighup_notify);
+  signal(SIGQUIT, sigquit_notify);
   printf("opsh: orca's Primitive SHell (Op-Shell) 1.5\n");
   //write_prompt(); // does not print to console
   char *command;
@@ -52,12 +64,17 @@ int main(int argc, char **argv) {
       //printf("\n");
       //printf(thing);
       printf("opsh: Bad command or binary\n");
+      perror("wordexp");
       continue;
     }
-    if (strcmp(command, "exit") == 0) {
+    if (strcmp(thing.we_wordv[0], "exit") == 0) {
       printf("exit opsh\n");
       wordfree(&thing);
       exit(0);
+    }
+    if (strcmp(thing.we_wordv[0], "crash") == 0) {
+      printf("%p", *pointer);
+      continue;
     }
     if (strcmp(thing.we_wordv[0], "cd") == 0) {
       if (thing.we_wordv[1] != NULL) {
