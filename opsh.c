@@ -17,8 +17,14 @@ void sighup_notify() {
 }
 
 void sigquit_notify() {
-  printf("\nSysRq or system shutdown\n");
+  printf("\nopsh: SysRq or system shutdown\n");
   exit(1);
+}
+
+void sigill_notify() {
+  const char *crash_msg = "\nopsh: CRITICAL HARDWARE ERROR\n";
+  write(STDERR_FILENO, crash_msg, strlen(crash_msg));
+  abort();
 }
 
 char *write_prompt() {
@@ -60,6 +66,7 @@ int main(int argc, char **argv) {
   signal(SIGINT, ignore_sigint);
   signal(SIGHUP, sighup_notify);
   signal(SIGQUIT, sigquit_notify);
+  signal(SIGILL, sigill_notify);
   printf("opsh: orca's Primitive SHell (Op-Shell) 1.6\n");
   //write_prompt(); // does not print to console
   char *command;
