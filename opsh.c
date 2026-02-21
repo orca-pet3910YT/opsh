@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
   signal(SIGINT, ignore_sigint);
   signal(SIGHUP, sighup_notify);
   signal(SIGQUIT, sigquit_notify);
-  printf("opsh: orca's Primitive SHell (Op-Shell) 1.5\n");
+  printf("opsh: orca's Primitive SHell (Op-Shell) 1.6\n");
   //write_prompt(); // does not print to console
   char *command;
   for (;;) {
