@@ -7,9 +7,9 @@
 #include <signal.h> // ignore signals
 #include <pwd.h> // passwd lookup
 
-char prompt[512];
+char prompt[2048];
 
-void ignore_sigint(int sig) { write(STDOUT_FILENO, "\n", 1); write(STDOUT_FILENO, prompt, strlen(prompt)); }
+void ignore_sigint() { write(STDOUT_FILENO, "\n", 1); write(STDOUT_FILENO, prompt, strlen(prompt)); }
 
 void sighup_notify() {
   printf("\nopsh: received signal SIGHUP, terminating\n");
@@ -24,7 +24,7 @@ void sigquit_notify() {
 char *write_prompt() {
   char hostname[128];
   char wd[1024];
-  char *path = getcwd(wd, 1023);
+  getcwd(wd, 1023);
   struct passwd *p = getpwuid(getuid());
   /*
   struct passwd {
@@ -45,11 +45,12 @@ char *write_prompt() {
     exit(1);
   }
   gethostname(hostname, 127);
-  snprintf(prompt, 511, "[\x1b[38;5;190m%s\x1b[0m@\x1b[38;5;190m%s\x1b[38;5;210m:\x1b[38;5;87m%s\x1b[0m]$ ", p->pw_name, hostname, wd);
+  snprintf(prompt, 2047, "[\x1b[38;5;190m%s\x1b[0m@\x1b[38;5;190m%s\x1b[38;5;210m:\x1b[38;5;87m%s\x1b[0m]$ ", p->pw_name, hostname, wd);
   return prompt;
 }
 
 int main(int argc, char **argv) {
+  (void)argc;
   if (argv[1]) {
     if (!strcmp(argv[1], "--cat")) {
       printf("meow\n"); // we need humor
