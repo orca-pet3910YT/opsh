@@ -1,11 +1,11 @@
 #include <unistd.h>
 #include <wordexp.h>
 #include <stdio.h>
-#include <sys/wait.h>
+#include <sys/wait.h> // so that the parent waits for the child
 #include <string.h>
 #include <stdlib.h>
-#include <signal.h>
-#include <pwd.h>
+#include <signal.h> // ignore signals
+#include <pwd.h> // passwd lookup
 
 char prompt[512];
 
@@ -26,6 +26,20 @@ char *write_prompt() {
   char wd[1024];
   char *path = getcwd(wd, 1023);
   struct passwd *p = getpwuid(getuid());
+  /*
+  struct passwd {
+	  char *pw_name; // login name
+	  char *pw_passwd; // encrypted password, unsupported
+	  uid_t pw_uid; // user ID
+	  gid_t pw_gid; // group ID
+	  time_t pw_change; // password change time, unsupported
+	  char *pw_class; // access class(?), unsupported
+	  char *pw_gecos; // full user name
+	  char *pw_dir; // home directory - what shells encode as `~`
+  	  char *pw_shell; // home shell - usually /bin/bash or /bin/zsh
+  	  time_t pw_expire; // when the password expires
+  };
+  */
   if (!p) {
     printf("opsh: failure to get current user");
     exit(1);
