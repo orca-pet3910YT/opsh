@@ -27,6 +27,12 @@ void sigill_notify() {
   abort();
 }
 
+void sigsegv_notify() {
+  const char *crash_msg = "\nopsh: process RAM read/write failure: likely\n\t- NULL pointer\n\t- modified/corrupt instructions or data\n\t- uncaught code failure\n";
+  write(STDERR_FILENO, crash_msg, strlen(crash_msg));
+  abort();
+}
+
 char *write_prompt() {
   char hostname[128];
   char wd[1024];
@@ -67,6 +73,7 @@ int main(int argc, char **argv) {
   signal(SIGHUP, sighup_notify);
   signal(SIGQUIT, sigquit_notify);
   signal(SIGILL, sigill_notify);
+  signal(SIGSEGV, sigsegv_notify);
   printf("opsh: orca's Primitive SHell (Op-Shell) 1.6\n");
   //write_prompt(); // does not print to console
   char *command;
