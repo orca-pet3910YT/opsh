@@ -6,9 +6,10 @@ Key features include... uh... \*crickets chirping\*
 File tree:
 ```
 /
+'- Makefile
+`- [opsh]
 `- opsh.c
 `- opsh.h
-`- Makefile
 `- README.md
 ```
 
