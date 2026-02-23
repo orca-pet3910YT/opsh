@@ -1,4 +1,4 @@
-# orca's Primitive SHell
+# orca's Primitive Shell
 This is opsh, a custom shell made in C!
 
 Key features include... uh... \*crickets chirping\*
