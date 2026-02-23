@@ -7,7 +7,7 @@ File tree:
 ```
 /
 '- Makefile
-`- [opsh]
+`-[opsh]
 `- opsh.c
 `- opsh.h
 `- README.md
