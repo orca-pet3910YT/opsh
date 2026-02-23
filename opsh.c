@@ -4,6 +4,7 @@
 #include <sys/wait.h> // so that the parent waits for the child
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "opsh.h"
 
 int main(int argc, char **argv) {
@@ -19,7 +20,7 @@ int main(int argc, char **argv) {
   signal(SIGQUIT, sigquit_notify);
   signal(SIGILL, sigill_notify);
   signal(SIGSEGV, sigsegv_notify);
-  printf("opsh: orca's Primitive SHell (Op-Shell) 1.6\n");
+  printf("opsh: orca's Primitive SHell (Op-Shell) 1.7\n");
   //write_prompt(); // does not print to console
   char *command;
   for (;;) {
@@ -40,11 +41,13 @@ int main(int argc, char **argv) {
     }
     //add_history(command); // so that arrow keys arrow key
     wordexp_t thing;
-    if (wordexp(command, &thing, 0) != 0) {
+    int wordexp_ret = wordexp(command, &thing, WRDE_NOCMD);
+    if (wordexp_ret != 0) {
       //printf(command);
       //printf("\n");
       //printf(thing);
       printf("opsh: Bad command or binary\n");
+      errno = wordexp_ret;
       perror("wordexp");
       continue;
     }
